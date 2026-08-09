@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Παραγγελία Εστιατορίου</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <h1 id="appTitle">Παραγγελία</h1>
+    <div class="badge-role" id="tableBadge"></div>
+  </div>
+  <div class="lang-switch" id="langSwitch">
+    <button data-lang="el">ΕΛ</button>
+    <button data-lang="en">EN</button>
+    <button data-lang="bg">БГ</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ENTRY: choose new table code or resume with existing code -->
+  <section id="entryScreen">
+    <div class="tabs">
+      <button class="tab-btn active" id="tabNewBtn" data-tab="new"></button>
+      <button class="tab-btn" id="tabResumeBtn" data-tab="resume"></button>
+    </div>
+
+    <div class="card" id="newTabPanel">
+      <label for="tableNumberInput" id="tableNumberLabel"></label>
+      <input type="number" id="tableNumberInput" min="1" max="999" inputmode="numeric" placeholder="π.χ. 12">
+      <div class="error-text hidden" id="newTableError"></div>
+      <button class="btn" id="generateCodeBtn"></button>
+    </div>
+
+    <div class="card hidden" id="resumeTabPanel">
+      <label for="resumeCodeInput" id="resumeCodeLabel"></label>
+      <input type="text" id="resumeCodeInput" maxlength="10" inputmode="numeric" placeholder="10-ψήφιος κωδικός">
+      <div class="error-text hidden" id="resumeError"></div>
+      <button class="btn" id="resumeBtn"></button>
+    </div>
+  </section>
+
+  <!-- CODE DISPLAY after generating a new table code -->
+  <section id="codeScreen" class="hidden">
+    <div class="card code-display">
+      <div class="hint" id="codeDisplayLabel"></div>
+      <div class="code" id="generatedCode"></div>
+      <p class="hint" id="codeHint"></p>
+      <button class="btn" id="continueToMenuBtn"></button>
+    </div>
+  </section>
+
+  <!-- ORDER SCREEN -->
+  <section id="orderScreen" class="hidden">
+    <div class="card" id="menuCard">
+      <div class="section-title" id="menuHeading"></div>
+      <div id="menuContainer"></div>
+    </div>
+
+    <div class="card" id="cartCard">
+      <div class="section-title" id="cartHeading"></div>
+      <div id="cartContainer">
+        <p class="hint" id="emptyCartMsg"></p>
+      </div>
+      <div class="cart-total hidden" id="cartTotalRow">
+        <span id="totalLabel"></span>
+        <span id="cartTotalValue"></span>
+      </div>
+      <textarea id="orderNotes" placeholder=""></textarea>
+      <button class="btn" id="submitOrderBtn"></button>
+    </div>
+
+    <div class="card">
+      <div class="section-title" id="orderStatusHeading"></div>
+      <div id="orderStatusContainer">
+        <p class="hint" id="noOrdersYet"></p>
+      </div>
+    </div>
+
+    <p class="hint" style="text-align:center">
+      <a href="#" id="changeTableLink"></a>
+    </p>
+  </section>
+
+</main>
+
+<p class="footer-note">Powered by Firebase &middot; <a href="kitchen.html">Κουζίνα</a> &middot; <a href="admin.html">Διαχείριση</a></p>
+
+<script type="module" src="assets/js/customer.js"></script>
+</body>
+</html>

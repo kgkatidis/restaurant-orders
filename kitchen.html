@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Κουζίνα &middot; Παραγγελίες</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <h1>Κουζίνα</h1>
+    <div class="badge-role" id="pendingCount"></div>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Πελάτης</a>
+    <a href="admin.html">Διαχείριση</a>
+  </div>
+</header>
+
+<main class="wide">
+  <div id="board" class="kitchen-board"></div>
+  <p class="empty-state hidden" id="emptyState">Δεν υπάρχουν εκκρεμείς παραγγελίες.</p>
+</main>
+
+<script type="module" src="assets/js/kitchen.js"></script>
+</body>
+</html>

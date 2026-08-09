@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Διαχείριση Μενού</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div><h1>Διαχείριση</h1></div>
+  <div class="nav-links">
+    <a href="index.html">Πελάτης</a>
+    <a href="kitchen.html">Κουζίνα</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- SETUP GATE: shown once, when no PIN has been set yet -->
+  <section id="setupGate" class="gate hidden">
+    <div class="card">
+      <p class="section-title">Ορισμός κωδικού πρόσβασης διαχειριστή</p>
+      <label for="setupPin1">Νέο PIN</label>
+      <input type="password" id="setupPin1" inputmode="numeric">
+      <label for="setupPin2">Επιβεβαίωση PIN</label>
+      <input type="password" id="setupPin2" inputmode="numeric">
+      <div class="error-text hidden" id="setupError"></div>
+      <button class="btn" id="setupBtn">Αποθήκευση</button>
+    </div>
+  </section>
+
+  <!-- LOGIN GATE -->
+  <section id="loginGate" class="gate hidden">
+    <div class="card">
+      <p class="section-title">Είσοδος διαχειριστή</p>
+      <label for="loginPin">PIN</label>
+      <input type="password" id="loginPin" inputmode="numeric">
+      <div class="error-text hidden" id="loginError"></div>
+      <button class="btn" id="loginBtn">Είσοδος</button>
+    </div>
+  </section>
+
+  <!-- ADMIN PANEL -->
+  <section id="adminPanel" class="hidden">
+
+    <div class="card">
+      <p class="section-title">Κατηγορίες</p>
+      <div id="categoryList"></div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
+      <input type="hidden" id="categoryEditId">
+      <div class="form-grid">
+        <div><label for="catNameEl">Όνομα (ΕΛ)</label><input type="text" id="catNameEl"></div>
+        <div><label for="catNameEn">Όνομα (EN)</label><input type="text" id="catNameEn"></div>
+        <div><label for="catNameBg">Όνομα (BG)</label><input type="text" id="catNameBg"></div>
+        <div><label for="catOrder">Σειρά εμφάνισης</label><input type="number" id="catOrder" value="0"></div>
+      </div>
+      <div class="error-text hidden" id="catError"></div>
+      <button class="btn" id="catSubmitBtn">Προσθήκη κατηγορίας</button>
+      <button class="btn secondary hidden" id="catCancelEditBtn">Ακύρωση επεξεργασίας</button>
+    </div>
+
+    <div class="card">
+      <p class="section-title">Προϊόντα μενού</p>
+      <div id="itemList"></div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
+      <input type="hidden" id="itemEditId">
+      <label for="itemCategory">Κατηγορία</label>
+      <select id="itemCategory"></select>
+      <div class="form-grid">
+        <div><label for="itemNameEl">Όνομα (ΕΛ)</label><input type="text" id="itemNameEl"></div>
+        <div><label for="itemNameEn">Όνομα (EN)</label><input type="text" id="itemNameEn"></div>
+        <div><label for="itemNameBg">Όνομα (BG)</label><input type="text" id="itemNameBg"></div>
+        <div><label for="itemPrice">Τιμή (€)</label><input type="number" id="itemPrice" step="0.01" min="0"></div>
+        <div class="full"><label for="itemDescEl">Περιγραφή (ΕΛ)</label><input type="text" id="itemDescEl"></div>
+        <div class="full"><label for="itemDescEn">Περιγραφή (EN)</label><input type="text" id="itemDescEn"></div>
+        <div class="full"><label for="itemDescBg">Περιγραφή (BG)</label><input type="text" id="itemDescBg"></div>
+        <div><label for="itemOrder">Σειρά εμφάνισης</label><input type="number" id="itemOrder" value="0"></div>
+        <div>
+          <label for="itemAvailable">Διαθεσιμότητα</label>
+          <select id="itemAvailable">
+            <option value="true">Διαθέσιμο</option>
+            <option value="false">Μη διαθέσιμο</option>
+          </select>
+        </div>
+      </div>
+      <div class="error-text hidden" id="itemError"></div>
+      <button class="btn" id="itemSubmitBtn">Προσθήκη προϊόντος</button>
+      <button class="btn secondary hidden" id="itemCancelEditBtn">Ακύρωση επεξεργασίας</button>
+    </div>
+
+    <div class="card">
+      <button class="btn secondary" id="changePinBtn">Αλλαγή PIN</button>
+    </div>
+
+  </section>
+
+</main>
+
+<script type="module" src="assets/js/admin.js"></script>
+</body>
+</html>
