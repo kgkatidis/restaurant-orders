@@ -142,6 +142,89 @@ function initData() {
     menuItems = snap.val() || {};
     renderItemList();
   });
+  onValue(ref(db, "tables"), (snap) => {
+    renderActiveTables(snap.val() || {});
+  });
+}
+
+// ---------- active tables ----------
+function renderActiveTables(tablesData) {
+  const list = el("activeTablesList");
+  list.innerHTML = "";
+  list.className = "kitchen-board";
+  const tables = Object.entries(tablesData)
+    .filter(([, t]) => t.meta && t.meta.paid !== true)
+    .map(([code, t]) => ({ code, ...t }))
+    .sort((a, b) => (a.meta.createdAt || 0) - (b.meta.createdAt || 0));
+
+  if (tables.length === 0) {
+    const p = document.createElement("p");
+    p.className = "hint";
+    p.textContent = "Δεν υπάρχουν ενεργά τραπέζια αυτή τη στιγμή.";
+    list.appendChild(p);
+    return;
+  }
+
+  tables.forEach((table) => {
+    const card = document.createElement("div");
+    card.className = "card table-card";
+
+    const heading = document.createElement("h2");
+    heading.textContent = `Τραπέζι ${table.meta.table}`;
+    card.appendChild(heading);
+
+    const meta = document.createElement("div");
+    meta.className = "table-meta";
+    meta.textContent = `Κωδικός: ${table.code}`;
+    card.appendChild(meta);
+
+    const orders = Object.values(table.orders || {}).sort(
+      (a, b) => (a.createdAt || 0) - (b.createdAt || 0)
+    );
+    let total = 0;
+    if (orders.length === 0) {
+      const p = document.createElement("p");
+      p.className = "hint";
+      p.textContent = "Δεν έχει σταλεί ακόμα παραγγελία.";
+      card.appendChild(p);
+    } else {
+      orders.forEach((o) => {
+        const lineTotal = Number(o.price || 0) * (o.qty || 0);
+        total += lineTotal;
+        const row = document.createElement("div");
+        row.className = "order-line";
+        const name = document.createElement("div");
+        name.textContent = `${o.name?.el || ""} × ${o.qty}`;
+        const price = document.createElement("div");
+        price.textContent = `${lineTotal.toFixed(2)} €`;
+        row.appendChild(name);
+        row.appendChild(price);
+        card.appendChild(row);
+      });
+      const totalRow = document.createElement("div");
+      totalRow.className = "cart-total";
+      const totalLabel = document.createElement("span");
+      totalLabel.textContent = "Σύνολο";
+      const totalValue = document.createElement("span");
+      totalValue.textContent = `${total.toFixed(2)} €`;
+      totalRow.appendChild(totalLabel);
+      totalRow.appendChild(totalValue);
+      card.appendChild(totalRow);
+    }
+
+    const paidBtn = document.createElement("button");
+    paidBtn.className = "btn";
+    paidBtn.textContent = "Πληρώθηκε";
+    paidBtn.addEventListener("click", () =>
+      update(ref(db, `tables/${table.code}/meta`), {
+        paid: true,
+        paidAt: serverTimestamp()
+      })
+    );
+    card.appendChild(paidBtn);
+
+    list.appendChild(card);
+  });
 }
 
 // ---------- categories ----------
