@@ -1,7 +1,8 @@
 import { db } from "./firebase-config.js";
 import {
-  ref, push, set, update, remove, onValue
+  ref, get, push, set, update, remove, onValue, query, orderByKey, startAt, endAt, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+import { codePrefix, buildCode, parseCode } from "./code.js";
 
 const PIN_KEY = "adminPin";
 const UNLOCK_KEY = "adminUnlocked";
@@ -81,6 +82,53 @@ el("changePinBtn").addEventListener("click", () => {
 });
 
 showGate();
+
+// ---------- table code generation ----------
+el("generateCodeBtn").addEventListener("click", async () => {
+  const err = el("tableCodeError");
+  err.classList.add("hidden");
+  const n = parseInt(el("tableNumberInput").value, 10);
+  if (!n || n < 1 || n > 999) {
+    err.textContent = "Δώστε αριθμό τραπεζιού από 1 έως 999.";
+    err.classList.remove("hidden");
+    return;
+  }
+  const btn = el("generateCodeBtn");
+  btn.disabled = true;
+  try {
+    const prefix = codePrefix(n);
+    const tablesRef = ref(db, "tables");
+    const q = query(tablesRef, orderByKey(), startAt(prefix + "00"), endAt(prefix + "99"));
+    const snap = await get(q);
+    let maxSeq = 0;
+    if (snap.exists()) {
+      snap.forEach((child) => {
+        const parsed = parseCode(child.key);
+        if (parsed && parsed.seq > maxSeq) maxSeq = parsed.seq;
+      });
+    }
+    const seq = maxSeq + 1;
+    if (seq > 99) {
+      err.textContent = "Έχει συμπληρωθεί ο μέγιστος αριθμός παρεών για αυτό το τραπέζι σήμερα.";
+      err.classList.remove("hidden");
+      return;
+    }
+    const code = buildCode(n, seq);
+    const parsed = parseCode(code);
+    await set(ref(db, `tables/${code}/meta`), {
+      table: parsed.table,
+      year: parsed.year,
+      dayOfYear: parsed.dayOfYear,
+      seq: parsed.seq,
+      createdAt: serverTimestamp()
+    });
+    el("generatedCode").textContent = code;
+    el("codeResult").classList.remove("hidden");
+    el("tableNumberInput").value = "";
+  } finally {
+    btn.disabled = false;
+  }
+});
 
 // ---------- data subscriptions ----------
 function initData() {

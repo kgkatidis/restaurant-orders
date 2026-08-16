@@ -1,9 +1,9 @@
 import { db } from "./firebase-config.js";
 import {
-  ref, get, set, push, onValue, query, orderByKey, startAt, endAt, serverTimestamp
+  ref, get, set, push, onValue, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
-import { codePrefix, buildCode, parseCode } from "./code.js";
-import { getLang, setLang, t, LANGS } from "./i18n.js";
+import { parseCode } from "./code.js";
+import { getLang, setLang, t } from "./i18n.js";
 
 const STORAGE_KEY = "tableCode";
 
@@ -18,24 +18,11 @@ let menuUnsub = null;
 const el = (id) => document.getElementById(id);
 
 const entryScreen = el("entryScreen");
-const codeScreen = el("codeScreen");
 const orderScreen = el("orderScreen");
-
-const tabNewBtn = el("tabNewBtn");
-const tabResumeBtn = el("tabResumeBtn");
-const newTabPanel = el("newTabPanel");
-const resumeTabPanel = el("resumeTabPanel");
-
-const tableNumberInput = el("tableNumberInput");
-const newTableError = el("newTableError");
-const generateCodeBtn = el("generateCodeBtn");
 
 const resumeCodeInput = el("resumeCodeInput");
 const resumeError = el("resumeError");
 const resumeBtn = el("resumeBtn");
-
-const generatedCode = el("generatedCode");
-const continueToMenuBtn = el("continueToMenuBtn");
 
 const menuContainer = el("menuContainer");
 const cartContainer = el("cartContainer");
@@ -47,21 +34,12 @@ const orderStatusContainer = el("orderStatusContainer");
 const tableBadge = el("tableBadge");
 const changeTableLink = el("changeTableLink");
 
-let pendingGeneratedCode = null;
-
 // ---------- i18n rendering ----------
 function applyTranslations() {
   document.documentElement.lang = lang;
   el("appTitle").textContent = t("app_title", lang);
-  tabNewBtn.textContent = t("tab_new", lang);
-  tabResumeBtn.textContent = t("tab_resume", lang);
-  el("tableNumberLabel").textContent = t("table_number_label", lang);
-  generateCodeBtn.textContent = t("generate_code_btn", lang);
   el("resumeCodeLabel").textContent = t("enter_code_label", lang);
   resumeBtn.textContent = t("enter_code_btn", lang);
-  el("codeDisplayLabel").textContent = t("code_display_label", lang);
-  el("codeHint").textContent = t("code_hint", lang);
-  continueToMenuBtn.textContent = t("continue_to_menu", lang);
   el("menuHeading").textContent = t("menu_heading", lang);
   el("cartHeading").textContent = t("cart_heading", lang);
   el("totalLabel").textContent = t("total", lang);
@@ -84,68 +62,6 @@ el("langSwitch").addEventListener("click", (e) => {
   lang = btn.dataset.lang;
   setLang(lang);
   applyTranslations();
-});
-
-// ---------- tabs ----------
-tabNewBtn.addEventListener("click", () => switchTab("new"));
-tabResumeBtn.addEventListener("click", () => switchTab("resume"));
-
-function switchTab(tab) {
-  tabNewBtn.classList.toggle("active", tab === "new");
-  tabResumeBtn.classList.toggle("active", tab === "resume");
-  newTabPanel.classList.toggle("hidden", tab !== "new");
-  resumeTabPanel.classList.toggle("hidden", tab !== "resume");
-}
-
-// ---------- new table code generation ----------
-generateCodeBtn.addEventListener("click", async () => {
-  newTableError.classList.add("hidden");
-  const n = parseInt(tableNumberInput.value, 10);
-  if (!n || n < 1 || n > 999) {
-    newTableError.textContent = t("invalid_table", lang);
-    newTableError.classList.remove("hidden");
-    return;
-  }
-  generateCodeBtn.disabled = true;
-  try {
-    const prefix = codePrefix(n);
-    const tablesRef = ref(db, "tables");
-    const q = query(tablesRef, orderByKey(), startAt(prefix + "00"), endAt(prefix + "99"));
-    const snap = await get(q);
-    let maxSeq = 0;
-    if (snap.exists()) {
-      snap.forEach((child) => {
-        const parsed = parseCode(child.key);
-        if (parsed && parsed.seq > maxSeq) maxSeq = parsed.seq;
-      });
-    }
-    const seq = maxSeq + 1;
-    if (seq > 99) {
-      newTableError.textContent = t("invalid_table", lang);
-      newTableError.classList.remove("hidden");
-      return;
-    }
-    const now = new Date();
-    const code = buildCode(n, seq, now);
-    const parsed = parseCode(code);
-    await set(ref(db, `tables/${code}/meta`), {
-      table: parsed.table,
-      year: parsed.year,
-      dayOfYear: parsed.dayOfYear,
-      seq: parsed.seq,
-      createdAt: serverTimestamp()
-    });
-    pendingGeneratedCode = code;
-    generatedCode.textContent = code;
-    entryScreen.classList.add("hidden");
-    codeScreen.classList.remove("hidden");
-  } finally {
-    generateCodeBtn.disabled = false;
-  }
-});
-
-continueToMenuBtn.addEventListener("click", () => {
-  if (pendingGeneratedCode) enterTable(pendingGeneratedCode);
 });
 
 // ---------- resume with existing code ----------
@@ -183,7 +99,6 @@ function enterTable(code) {
   const parsed = parseCode(code);
   tableBadge.textContent = `${t("table_label", lang)} ${parsed.table} · ${code}`;
   entryScreen.classList.add("hidden");
-  codeScreen.classList.add("hidden");
   orderScreen.classList.remove("hidden");
   cart = {};
   subscribeMenu();
@@ -196,9 +111,7 @@ function leaveTable() {
   if (menuUnsub) menuUnsub();
   cart = {};
   orderScreen.classList.add("hidden");
-  codeScreen.classList.add("hidden");
   entryScreen.classList.remove("hidden");
-  tableNumberInput.value = "";
   resumeCodeInput.value = "";
 }
 
@@ -398,7 +311,7 @@ function renderOrderStatus(list) {
   if (list.length === 0) {
     const msg = document.createElement("p");
     msg.className = "hint";
-    msg.textContent = t("empty_cart", lang);
+    msg.textContent = t("no_orders_yet", lang);
     orderStatusContainer.appendChild(msg);
     return;
   }

@@ -46,6 +46,19 @@
   <section id="adminPanel" class="hidden">
 
     <div class="card">
+      <p class="section-title">Δημιουργία κωδικού τραπεζιού</p>
+      <label for="tableNumberInput">Αριθμός τραπεζιού</label>
+      <input type="number" id="tableNumberInput" min="1" max="999" inputmode="numeric" placeholder="π.χ. 12">
+      <div class="error-text hidden" id="tableCodeError"></div>
+      <button class="btn" id="generateCodeBtn">Δημιουργία κωδικού</button>
+      <div class="code-display hidden" id="codeResult">
+        <div class="hint">Ο κωδικός του τραπεζιού είναι</div>
+        <div class="code" id="generatedCode"></div>
+        <p class="hint">Δώστε αυτόν τον κωδικό στον πελάτη για να παραγγείλει από το κινητό του.</p>
+      </div>
+    </div>
+
+    <div class="card">
       <p class="section-title">Κατηγορίες</p>
       <div id="categoryList"></div>
       <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
