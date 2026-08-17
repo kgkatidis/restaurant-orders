@@ -4,6 +4,10 @@ import { ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.13.0
 const board = document.getElementById("board");
 const emptyState = document.getElementById("emptyState");
 const pendingCount = document.getElementById("pendingCount");
+const menuAvailabilityList = document.getElementById("menuAvailabilityList");
+
+let categories = {};
+let menuItems = {};
 
 const STATUS_LABEL = {
   pending: "Σε εκκρεμότητα",
@@ -110,4 +114,77 @@ function render(tablesData) {
 
 onValue(ref(db, "tables"), (snap) => {
   render(snap.val());
+});
+
+// ---------- menu availability ----------
+function renderMenuAvailability() {
+  menuAvailabilityList.innerHTML = "";
+  const catList = Object.entries(categories)
+    .map(([id, c]) => ({ id, ...c }))
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  const itemsByCategory = {};
+  Object.entries(menuItems).forEach(([id, item]) => {
+    const catId = item.categoryId || "_uncat";
+    if (!itemsByCategory[catId]) itemsByCategory[catId] = [];
+    itemsByCategory[catId].push({ id, ...item });
+  });
+
+  const renderGroup = (catId, catName) => {
+    const items = (itemsByCategory[catId] || []).sort((a, b) => (a.order || 0) - (b.order || 0));
+    if (items.length === 0) return;
+    if (catName) {
+      const heading = document.createElement("div");
+      heading.className = "category-heading";
+      heading.textContent = catName;
+      menuAvailabilityList.appendChild(heading);
+    }
+    items.forEach((item) => menuAvailabilityList.appendChild(renderAvailabilityRow(item)));
+  };
+
+  const knownIds = new Set(catList.map((c) => c.id));
+  catList.forEach((c) => renderGroup(c.id, c.name?.el || ""));
+  Object.keys(itemsByCategory)
+    .filter((id) => !knownIds.has(id))
+    .forEach((id) => renderGroup(id, ""));
+
+  if (Object.keys(menuItems).length === 0) {
+    const p = document.createElement("p");
+    p.className = "hint";
+    p.textContent = "Δεν υπάρχουν προϊόντα στο μενού ακόμα.";
+    menuAvailabilityList.appendChild(p);
+  }
+}
+
+function renderAvailabilityRow(item) {
+  const row = document.createElement("div");
+  row.className = "admin-item-row";
+
+  const info = document.createElement("div");
+  info.className = "info";
+  const name = document.createElement("div");
+  name.className = "name";
+  name.textContent = item.name?.el || "";
+  info.appendChild(name);
+  row.appendChild(info);
+
+  const availBtn = document.createElement("button");
+  availBtn.className = `pill-toggle ${item.available === false ? "off" : "on"}`;
+  availBtn.textContent = item.available === false ? "Μη διαθέσιμο" : "Διαθέσιμο";
+  availBtn.addEventListener("click", () =>
+    update(ref(db, `menu/${item.id}`), { available: item.available === false })
+  );
+  row.appendChild(availBtn);
+
+  return row;
+}
+
+onValue(ref(db, "categories"), (snap) => {
+  categories = snap.val() || {};
+  renderMenuAvailability();
+});
+
+onValue(ref(db, "menu"), (snap) => {
+  menuItems = snap.val() || {};
+  renderMenuAvailability();
 });

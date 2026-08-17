@@ -15,13 +15,19 @@
   </div>
   <div class="nav-links">
     <a href="index.html">Πελάτης</a>
-    <a href="admin.html">Διαχείριση</a>
+    <a href="admin.html">Μενού</a>
+    <a href="manager.html">Υπεύθυνος</a>
   </div>
 </header>
 
 <main class="wide">
   <div id="board" class="kitchen-board"></div>
   <p class="empty-state hidden" id="emptyState">Δεν υπάρχουν εκκρεμείς παραγγελίες.</p>
+
+  <div class="card">
+    <p class="section-title">Διαθεσιμότητα πιάτων</p>
+    <div id="menuAvailabilityList"></div>
+  </div>
 </main>
 
 <script type="module" src="assets/js/kitchen.js"></script>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Διαχείριση Παραγγελιών</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div><h1>Υπεύθυνος</h1></div>
+  <div class="nav-links">
+    <a href="index.html">Πελάτης</a>
+    <a href="kitchen.html">Κουζίνα</a>
+    <a href="admin.html">Μενού</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- SETUP GATE: shown once, when no PIN has been set yet -->
+  <section id="setupGate" class="gate hidden">
+    <div class="card">
+      <p class="section-title">Ορισμός κωδικού πρόσβασης υπευθύνου</p>
+      <label for="setupPin1">Νέο PIN</label>
+      <input type="password" id="setupPin1" inputmode="numeric">
+      <label for="setupPin2">Επιβεβαίωση PIN</label>
+      <input type="password" id="setupPin2" inputmode="numeric">
+      <div class="error-text hidden" id="setupError"></div>
+      <button class="btn" id="setupBtn">Αποθήκευση</button>
+    </div>
+  </section>
+
+  <!-- LOGIN GATE -->
+  <section id="loginGate" class="gate hidden">
+    <div class="card">
+      <p class="section-title">Είσοδος υπευθύνου</p>
+      <label for="loginPin">PIN</label>
+      <input type="password" id="loginPin" inputmode="numeric">
+      <div class="error-text hidden" id="loginError"></div>
+      <button class="btn" id="loginBtn">Είσοδος</button>
+    </div>
+  </section>
+
+  <!-- MANAGER PANEL -->
+  <section id="managerPanel" class="hidden">
+
+    <div class="card">
+      <p class="section-title">Δημιουργία κωδικού τραπεζιού</p>
+      <label for="tableNumberInput">Αριθμός τραπεζιού</label>
+      <input type="number" id="tableNumberInput" min="1" max="999" inputmode="numeric" placeholder="π.χ. 12">
+      <div class="error-text hidden" id="tableCodeError"></div>
+      <button class="btn" id="generateCodeBtn">Δημιουργία κωδικού</button>
+      <div class="code-display hidden" id="codeResult">
+        <div class="hint">Ο κωδικός του τραπεζιού είναι</div>
+        <div class="code" id="generatedCode"></div>
+        <p class="hint">Δώστε αυτόν τον κωδικό στον πελάτη για να παραγγείλει από το κινητό του.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="section-title">Ενεργά τραπέζια</p>
+      <div id="activeTablesList"></div>
+    </div>
+
+    <div class="card">
+      <button class="btn secondary" id="changePinBtn">Αλλαγή PIN</button>
+    </div>
+
+  </section>
+
+</main>
+
+<script type="module" src="assets/js/manager.js"></script>
+</body>
+</html>
